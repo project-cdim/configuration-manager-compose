@@ -1,0 +1,76 @@
+services:
+  configuration-manager:
+    build:
+      context: .
+      dockerfile: ./configuration-manager/Dockerfile
+    container_name: configuration-manager
+    ports:
+      - 8280:8080
+      - 3505:3500
+    networks:
+      - cdim-net
+    volumes:
+      - configuration-manager-log:/var/log/cdim
+      - ./configuration-manager/configuration-manager:/app
+    logging:
+      options:
+        max-size: 50m
+
+  configuration-manager-dapr:
+    image: daprio/daprd:edge
+    container_name: configuration-manager-dapr
+    command:
+      [
+        "./daprd",
+        "-app-id","configuration-manager",
+        "-app-port","8080",
+        "-dapr-http-port","3500",
+        "-placement-host-address",
+        "placement:50006",
+        "-config",
+        "/configuration/config.yaml",
+        "-resources-path",
+        "/components"
+      ]
+    volumes:
+      - "./configuration-manager/dapr/components/:/components"
+      - "./configuration-manager/dapr/configuration/:/configuration"
+      - "./configuration-manager/dapr/secrets/:/secrets"
+    depends_on:
+      - configuration-manager
+    network_mode: "service:configuration-manager"
+    logging:
+      options:
+        max-size: 50m
+
+  configuration-manager-db:
+    image: apache/age:release_PG16_1.5.0
+    env_file:
+      - configuration-manager-db/.env
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/cmdb_password
+    container_name: configuration-manager-db
+    ports:
+      - 5443:5432
+    networks:
+      - cdim-net
+    volumes:
+      - configuration-manager-db:/var/lib/postgresql/data
+      - ./configuration-manager-db/init:/docker-entrypoint-initdb.d
+    logging:
+      options:
+        max-size: 50m
+    secrets:
+      - cmdb_password
+
+networks:
+  cdim-net:
+    external: true
+
+volumes:
+  configuration-manager-log:
+  configuration-manager-db:
+
+secrets:
+  cmdb_password:
+    file: secret/cmdb_password.txt
