@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # Copyright (C) 2025 NEC Corporation.
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -17,7 +17,7 @@
 sed -i "s/^#jit = on/jit = off/g" /var/lib/postgresql/data/postgresql.conf
 current_datetime_iso8601=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    CREATE EXTENSION age;
+    CREATE EXTENSION IF NOT EXISTS age;
     LOAD 'age';
     SET search_path = ag_catalog, $POSTGRES_USER, public;
     ALTER ROLE $POSTGRES_USER SET search_path TO ag_catalog,"\$user",public;
@@ -42,6 +42,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     SELECT CREATE_VLABEL('cdim_graph', 'Chassis');
     SELECT CREATE_VLABEL('cdim_graph', 'NotDetectedDevice');
     SELECT CREATE_VLABEL('cdim_graph', 'ResourceGroups');
+    SELECT CREATE_VLABEL('cdim_graph', 'Unit');
 
     SELECT CREATE_ELABEL('cdim_graph', 'Connect');
     SELECT CREATE_ELABEL('cdim_graph', 'Compose');
@@ -50,6 +51,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     SELECT CREATE_ELABEL('cdim_graph', 'Have');
     SELECT CREATE_ELABEL('cdim_graph', 'Include');
     SELECT CREATE_ELABEL('cdim_graph', 'NotDetected');
+    SELECT CREATE_ELABEL('cdim_graph', 'Contain');
 
     CREATE INDEX cdim_graph_CXLswitch_idx ON cdim_graph."CXLswitch" USING gin (properties);
     CREATE INDEX cdim_graph_Annotation_idx ON cdim_graph."Annotation" USING gin (properties);
@@ -69,6 +71,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     CREATE INDEX cdim_graph_Chassis_idx ON cdim_graph."Chassis" USING gin (properties);
     CREATE INDEX cdim_graph_NotDetectedDevice_idx ON cdim_graph."NotDetectedDevice" USING gin (properties);
     CREATE INDEX cdim_graph_ResourceGroups_idx ON cdim_graph."ResourceGroups" USING gin (properties);
+    CREATE INDEX cdim_graph_Unit_idx ON cdim_graph."Unit" USING gin (properties);
 
     SELECT * FROM cypher('cdim_graph', \$\$ CREATE (a: NotDetectedDevice) \$\$) AS (a agtype);
 

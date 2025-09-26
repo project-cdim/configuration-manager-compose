@@ -1,0 +1,13 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: configuration_manager_hwsync
+spec:
+  type: pubsub.jetstream
+  version: v1
+  metadata:
+  - name: natsURL
+    value: "nats://message-broker:4222"
+  - name: streamName
+    value: "configuration_manager_hwsync"
+

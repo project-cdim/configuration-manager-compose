@@ -50,8 +50,6 @@ services:
     environment:
       POSTGRES_PASSWORD_FILE: /run/secrets/cmdb_password
     container_name: configuration-manager-db
-    ports:
-      - 5443:5432
     networks:
       - cdim-net
     volumes:

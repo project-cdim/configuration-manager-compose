@@ -1,4 +1,4 @@
-FROM golang:1.23-alpine
+FROM golang:1.24-alpine3.22
 
 # upgrading packages
 RUN apk update && \
@@ -20,4 +20,3 @@ RUN go mod download
 COPY configuration-manager/configuration-manager .
 RUN go build -o /configuration-manager
 CMD [ "/configuration-manager" ]
-
