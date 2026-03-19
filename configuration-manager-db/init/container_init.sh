@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2025 NEC Corporation.
+# Copyright (C) 2025-2026 NEC Corporation.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -42,7 +42,10 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     SELECT CREATE_VLABEL('cdim_graph', 'Chassis');
     SELECT CREATE_VLABEL('cdim_graph', 'NotDetectedDevice');
     SELECT CREATE_VLABEL('cdim_graph', 'ResourceGroups');
-    SELECT CREATE_VLABEL('cdim_graph', 'Unit');
+    SELECT CREATE_VLABEL('cdim_graph', 'DeviceUnit');
+    SELECT CREATE_VLABEL('cdim_graph', 'SourceFabricAdapter');
+    SELECT CREATE_VLABEL('cdim_graph', 'DestinationFabricAdapter');
+    SELECT CREATE_VLABEL('cdim_graph', 'Fabric');
 
     SELECT CREATE_ELABEL('cdim_graph', 'Connect');
     SELECT CREATE_ELABEL('cdim_graph', 'Compose');
@@ -52,6 +55,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     SELECT CREATE_ELABEL('cdim_graph', 'Include');
     SELECT CREATE_ELABEL('cdim_graph', 'NotDetected');
     SELECT CREATE_ELABEL('cdim_graph', 'Contain');
+    SELECT CREATE_ELABEL('cdim_graph', 'Host');
 
     CREATE INDEX cdim_graph_CXLswitch_idx ON cdim_graph."CXLswitch" USING gin (properties);
     CREATE INDEX cdim_graph_Annotation_idx ON cdim_graph."Annotation" USING gin (properties);
@@ -71,7 +75,10 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     CREATE INDEX cdim_graph_Chassis_idx ON cdim_graph."Chassis" USING gin (properties);
     CREATE INDEX cdim_graph_NotDetectedDevice_idx ON cdim_graph."NotDetectedDevice" USING gin (properties);
     CREATE INDEX cdim_graph_ResourceGroups_idx ON cdim_graph."ResourceGroups" USING gin (properties);
-    CREATE INDEX cdim_graph_Unit_idx ON cdim_graph."Unit" USING gin (properties);
+    CREATE INDEX cdim_graph_DeviceUnit_idx ON cdim_graph."DeviceUnit" USING gin (properties);
+    CREATE INDEX cdim_graph_SourceFabricAdapter_idx ON cdim_graph."SourceFabricAdapter" USING gin (properties);
+    CREATE INDEX cdim_graph_DestinationFabricAdapter_idx ON cdim_graph."DestinationFabricAdapter" USING gin (properties);
+    CREATE INDEX cdim_graph_Fabric_idx ON cdim_graph."Fabric" USING gin (properties);
 
     SELECT * FROM cypher('cdim_graph', \$\$ CREATE (a: NotDetectedDevice) \$\$) AS (a agtype);
 
